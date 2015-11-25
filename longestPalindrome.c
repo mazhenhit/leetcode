@@ -2,89 +2,98 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* preProcess(char *s)
+char* longestPalindrome(char *s)
 {
-	int i;
+	char *d = NULL;
+	char *rsl = NULL;
+	int *p = NULL;
+	int length = 0;
+	int newLen = 0;
+	int i = 0;
 	int j = 0;
-	int length;
-	char* ret = NULL;
+	int C = 0;
+	int R = 0;
+	int im = 0;
+	int maxLen = 0;
+	int center = 0;
+	int start = 0;
 
 	length = strlen(s);
-
-	if(length == 0)
-		return "^$";
-
-	ret = (char *)malloc(length + 2);
-	if(ret == NULL)
+	newLen = 2 * length + 2;
+	d = (char *)malloc(sizeof(char) * newLen);
+	if(d == NULL)
 	{
-		printf("ret is NULL.....\n");
+		printf("d is NULL...");
+		return NULL;
+	}
+	for(i = 0; i < length; i++)
+	{
+		d[j++] = '#';
+		d[j++] = s[i];
+	}
+	d[j++] = '#';
+	d[j] = '\0';
+
+	p = (int *)malloc(sizeof(int) * newLen);
+	if(p == NULL)
+	{
+		printf("The p is NULL!\n");
 		return NULL;
 	}
 
-	for(i = 0; i < length; i++)
+	for(i = 1; i < newLen - 1; i++)
 	{
-		ret[j++] = '#';
-		ret[j++] = s[i];
-	}
-	ret[j++] = '#';
-	ret[j] = '\0';
-	return ret;
-}
+		im = 2 * C - i;
+		if(im > 0 && i + p[im] <= R)
+			p[i] = p[im];
+		else
+			p[i] = 0;
 
-char* longestPalindrome(char *s)
-{
-	char *T = NULL;
-	int n;
-	char *P = NULL;
-	int C = 0;
-	int R = 0;
-	int i;
-	int i_m;
-	int max_len = 0; 
-	int center_index = 0;
-	int start = 0;
+		while(d[i + 1 + p[i]] == d[i - 1 - p[i]] && i - 1 - p[i] >= 0) 
+			p[i]++;
 
-	T = preProcess(s);
-	printf("T is %s\n", T);
-	n = strlen(T);
-	P = (char *)malloc(sizeof(char) * n);
-
-	for(i = 1; i < n - 1; i++)
-	{
-		i_m = 2 * C - i;
-		P[i] = (R > i) ? (R-i < P[i_m] ? R - i : P[i_m]) : 0;
-
-		while(T[i + 1 + P[i]] == T[i - 1 - P[i]])
-			P[i]++;
-
-		if(i + P[i] > R)
+		if(i + p[i] > R)
 		{
 			C = i;
-			R = i + P[i];
+			R = i + p[i];
 		}
 	}
 
+	free(d);
 
-	for(i = 1; i < n - 1; i++)
+	for(i = 1; i < newLen - 1;i++)
 	{
-		if(P[i] > max_len)
+		if(p[i] > maxLen)
 		{
-			max_len = P[i];
-			center_index = i;
+			maxLen = p[i];
+			center = i;
 		}
 	}
 
-	start = (center_index - 1 - max_len) / 2;
-	s[start + max_len] = '\0';
-	return s + start;
+	free(p);
+
+	start = center - maxLen > 0 ? (center - maxLen) / 2 : (maxLen - center) / 2;
+	rsl = (char *)malloc(sizeof(char) * maxLen);
+	if(rsl == NULL)
+	{
+		printf("rsl is NULL......\n");
+		return NULL;
+	}
+	for(i = 0; i < maxLen; i++)
+	{
+		rsl[i] = s[i + start];
+	}
+	rsl[maxLen] = '\0';
+	return rsl;
 }
 
 int main()
 {
-	char *s = "Helloabccbadefg";
-
-	printf("%s\n", s);
-	printf("%s\n", preProcess(s));
-	printf("%s\n", longestPalindrome(s));
+	char *s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	char *d = NULL;
+	d = longestPalindrome(s);
+	if(d != NULL)
+		printf("%s\n", d);
 	return 0;
 }
+
